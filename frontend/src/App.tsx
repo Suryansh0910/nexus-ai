@@ -1,56 +1,50 @@
-import { useState, useEffect } from 'react';
-import './index.css';
-import './App.css';
-import Sidebar from '../component/sideBar';
-import Main from '../component/main';
-import AuthModal from '../component/AuthModal';
+import { useState, useEffect } from 'react'
+import './index.css'
+import './App.css'
+import Sidebar from '../component/sideBar'
+import Main from '../component/main'
+import AuthModal from '../component/AuthModal'
 
 function App() {
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
-
+  let [modal, setModal] = useState(false)
+  let [isLogin, setIsLogin] = useState(true)
+  let [user, setUser] = useState<any>(null)
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('userData');
+    let t = localStorage.getItem('token')
+    let u = localStorage.getItem('userData')
+    if (t && u) setUser(JSON.parse(u))
+  }, [])
 
-    if (token && storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (e) {
-        console.error("Failed to parse stored user data");
-        localStorage.removeItem('userData');
-      }
-    }
-  }, []);
+  function handleLogin(data: any) {
+    localStorage.setItem('userData', JSON.stringify(data))
+    setUser(data)
+    setModal(false)
+  }
 
-  const handleLogin = (userData: any) => {
-    localStorage.setItem('userData', JSON.stringify(userData));
-    setUser(userData);
-    setIsAuthModalOpen(false);
-  };
+  function handleLogout() {
+    localStorage.removeItem('token')
+    localStorage.removeItem('userData')
+    setUser(null)
+  }
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userData');
-    setUser(null);
-  };
+  function openModal(login: boolean) {
+    setIsLogin(login)
+    setModal(true)
+  }
 
   return (
     <div className="app-container">
-      <Sidebar
-        user={user}
-        onOpenAuth={() => setIsAuthModalOpen(true)}
-        onLogout={handleLogout}
-      />
-      <Main />
+      <Sidebar user={user} onLogout={handleLogout} />
+      <Main user={user} openAuth={openModal} />
       <AuthModal
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
+        open={modal}
+        close={() => setModal(false)}
         onLogin={handleLogin}
+        startWithLogin={isLogin}
       />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

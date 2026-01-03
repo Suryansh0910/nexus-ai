@@ -1,17 +1,13 @@
-import React from 'react';
-import './sideBar.css';
-import logo from "./logo.png";
+import { LogOut } from 'lucide-react'
+import './sideBar.css'
+import logo from './logo.png'
 
-interface SidebarProps {
-    user?: {
-        username: string;
-        email: string;
-    } | null;
-    onOpenAuth?: () => void;
-    onLogout?: () => void;
+type Props = {
+    user: { username: string, email: string } | null
+    onLogout: () => void
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ user, onOpenAuth, onLogout }) => {
+function Sidebar({ user, onLogout }: Props) {
     return (
         <div className="sidebar">
             <div className="sidebar-content">
@@ -34,34 +30,25 @@ const Sidebar: React.FC<SidebarProps> = ({ user, onOpenAuth, onLogout }) => {
                 </div>
 
                 <div className="sidebar-footer">
-                    {user ? (
+                    {user && (
                         <div className="user-section">
-                            <button className="upgrade-btn">
-                                Upgrade Plan
-                            </button>
-
+                            <button className="upgrade-btn">Upgrade Plan</button>
                             <div className="user-profile">
-                                <div className="user-avatar">
-                                    {user.username.charAt(0).toUpperCase()}
-                                </div>
+                                <div className="user-avatar">{user.username.charAt(0).toUpperCase()}</div>
                                 <div className="user-info">
                                     <span className="user-name">{user.username}</span>
                                     <span className="user-plan">Free Plan</span>
                                 </div>
                                 <button className="logout-btn" onClick={onLogout} title="Logout">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                                    <LogOut size={16} />
                                 </button>
                             </div>
                         </div>
-                    ) : (
-                        <button className="signin-btn" onClick={onOpenAuth}>
-                            Sign In / Sign Up
-                        </button>
                     )}
                 </div>
             </div>
         </div>
-    );
-};
+    )
+}
 
-export default Sidebar;
+export default Sidebar

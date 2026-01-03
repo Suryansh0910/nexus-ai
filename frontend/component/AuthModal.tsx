@@ -1,128 +1,110 @@
-import React, { useState } from 'react';
-import './AuthModal.css';
+import { useState, useEffect } from 'react'
+import './AuthModal.css'
 
-interface AuthModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onLogin: (userData: any) => void;
+type Props = {
+    open: boolean
+    close: () => void
+    onLogin: (data: any) => void
+    startWithLogin?: boolean
 }
 
-const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onLogin }) => {
-    const [isSignIn, setIsSignIn] = useState(true);
-    const [formData, setFormData] = useState({
-        username: '',
-        email: '',
-        password: ''
-    });
-    const [error, setError] = useState('');
+function AuthModal({ open, close, onLogin, startWithLogin = true }: Props) {
+    let [mode, setMode] = useState(startWithLogin)
+    let [form, setForm] = useState({ username: '', email: '', password: '' })
+    let [error, setError] = useState('')
 
-    if (!isOpen) return null;
+    useEffect(() => {
+        if (open) {
+            setMode(startWithLogin)
+            setError('')
+            setForm({ username: '', email: '', password: '' })
+        }
+    }, [open, startWithLogin])
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
+    if (!open) return null
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError('');
+    function update(e: any) {
+        setForm({ ...form, [e.target.name]: e.target.value })
+    }
 
-        const endpoint = isSignIn ? '/api/auth/signin' : '/api/auth/signup';
-        const url = `http://localhost:3000${endpoint}`;
+    async function submit(e: any) {
+        e.preventDefault()
+        setError('')
 
-        const payload = isSignIn
-            ? { email: formData.email, password: formData.password }
-            : formData;
+        let endpoint = mode ? 'signin' : 'signup'
+        let body = mode ? { email: form.email, password: form.password } : form
 
         try {
-            const response = await fetch(url, {
+            let res = await fetch(`http://localhost:3000/api/auth/${endpoint}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
+                body: JSON.stringify(body)
+            })
+            let data = await res.json()
 
-            const data = await response.json();
-
-            if (response.ok) {
-                localStorage.setItem('token', data.token);
-                onLogin(data.user);
-                onClose();
+            if (res.ok) {
+                localStorage.setItem('token', data.token)
+                onLogin(data.user)
+                close()
             } else {
-                setError(data.msg || 'Something went wrong');
+                setError(data.msg || 'Something went wrong')
             }
-        } catch (err: any) {
-            setError('Failed to connect to server');
+        } catch (err) {
+            setError('Cant connect to server')
         }
-    };
+    }
 
     return (
-        <div className="auth-overlay" onClick={onClose}>
+        <div className="auth-overlay" onClick={close}>
             <div className="auth-modal" onClick={e => e.stopPropagation()}>
-                <button className="close-btn" onClick={onClose}>
+                <button className="close-btn" onClick={close}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M18 6L6 18M6 6l12 12"></path>
                     </svg>
                 </button>
 
                 <div className="auth-header">
-                    <h2>{isSignIn ? 'Welcome Back' : 'Create Account'}</h2>
-                    <p>{isSignIn ? 'Sign in to continue to Nexus AI' : 'Join Nexus AI today'}</p>
+                    <h2>{mode ? 'Welcome Back' : 'Create Account'}</h2>
+                    <p>{mode ? 'Sign in to continue to Nexus AI' : 'Join Nexus AI today'}</p>
                 </div>
 
                 {error && <div className="error-message">{error}</div>}
 
-                <form className="auth-form" onSubmit={handleSubmit}>
-                    {!isSignIn && (
+                <form className="auth-form" onSubmit={submit}>
+                    {!mode && (
                         <div className="form-group">
                             <label>Username</label>
-                            <input
-                                type="text"
-                                name="username"
-                                placeholder="Enter username"
-                                value={formData.username}
-                                onChange={handleChange}
-                                required={!isSignIn}
-                            />
+                            <input type="text" name="username" placeholder="Enter username"
+                                value={form.username} onChange={update} required />
                         </div>
                     )}
 
                     <div className="form-group">
                         <label>Email</label>
-                        <input
-                            type="email"
-                            name="email"
-                            placeholder="Enter email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                        />
+                        <input type="email" name="email" placeholder="Enter email"
+                            value={form.email} onChange={update} required />
                     </div>
 
                     <div className="form-group">
                         <label>Password</label>
-                        <input
-                            type="password"
-                            name="password"
-                            placeholder="Enter password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
-                        />
+                        <input type="password" name="password" placeholder="Enter password"
+                            value={form.password} onChange={update} required />
                     </div>
 
                     <button type="submit" className="submit-btn">
-                        {isSignIn ? 'Sign In' : 'Sign Up'}
+                        {mode ? 'Sign In' : 'Sign Up'}
                     </button>
                 </form>
 
                 <div className="auth-footer">
-                    {isSignIn ? "Don't have an account?" : "Already have an account?"}
-                    <button onClick={() => setIsSignIn(!isSignIn)}>
-                        {isSignIn ? 'Sign Up' : 'Sign In'}
+                    {mode ? "Don't have an account?" : "Already have an account?"}
+                    <button onClick={() => setMode(!mode)}>
+                        {mode ? 'Sign Up' : 'Sign In'}
                     </button>
                 </div>
             </div>
         </div>
-    );
-};
+    )
+}
 
-export default AuthModal;
+export default AuthModal
