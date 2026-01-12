@@ -1,33 +1,114 @@
+import { useState } from 'react'
 import './main.css'
-import { Bot, Sparkles, Brain, ChevronDown, Paperclip, Mic, Send } from 'lucide-react'
+import { Bot, Sparkles, Brain, Plus, Send, Loader2, Save, AlertCircle, CheckCircle, X } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
-// model list for the panels
 let models = [
-    { id: 'gpt', name: 'GPT 4.1 Mini', icon: <Bot size={18} />, color: 'gpt-icon' },
-    { id: 'gemini', name: 'Gemini 2.5 Lite', icon: <Sparkles size={18} />, color: 'gemini-icon' },
-    { id: 'deepseek', name: 'DeepSeek R1', icon: <Brain size={18} />, color: 'deepseek-icon' }
+    { id: 'gpt', name: 'Mistral Dev', icon: <Bot size={18} />, color: 'gptIcon' },
+    { id: 'gemini', name: 'Nvidia Nemotron', icon: <Sparkles size={18} />, color: 'geminiIcon' },
+    { id: 'deepseek', name: 'DeepSeek R1', icon: <Brain size={18} />, color: 'deepseekIcon' }
 ]
 
-function Main({ user, openAuth }: { user: any, openAuth: (v: boolean) => void }) {
+function Main({ user, openAuth, loadedChat, onChatSaved, onNewChat }: any) {
+    let [input, setInput] = useState(loadedChat?.interactions?.[loadedChat.interactions.length - 1]?.prompt || '')
+    let [gptRes, setGptRes] = useState(loadedChat?.interactions?.[loadedChat.interactions.length - 1]?.responses?.gpt || '')
+    let [gemRes, setGemRes] = useState(loadedChat?.interactions?.[loadedChat.interactions.length - 1]?.responses?.gemini || '')
+    let [dsRes, setDsRes] = useState(loadedChat?.interactions?.[loadedChat.interactions.length - 1]?.responses?.deepseek || '')
+    let [loading, setLoading] = useState(false)
+    let [chatId, setChatId] = useState(loadedChat?._id || null)
+    let [lastPrompt, setLastPrompt] = useState(loadedChat?.interactions?.[loadedChat.interactions.length - 1]?.prompt || '')
+    let [toast, setToast] = useState<any>(null)
+    let [enabled, setEnabled] = useState<any>({ gpt: true, gemini: true, deepseek: true })
 
-    // show landing if not logged in
+    function showToast(msg: string, type: 'success' | 'error') {
+        setToast({ msg, type })
+        setTimeout(() => setToast(null), 3000)
+    }
+
+    async function sendMessage() {
+        if (!input.trim()) return
+        setLoading(true)
+        setLastPrompt(input)
+        setGptRes('')
+        setGemRes('')
+        setDsRes('')
+
+        const parse = (data: any) => {
+            if (data.error) return `Error: ${data.error.message}`
+            const msg = data.choices?.[0]?.message
+            if (!msg) return 'Error: No respond'
+            let out = ''
+            if (msg.reasoning) out += `> **Thinking:**\n> ${msg.reasoning.replace(/\n/g, '\n> ')}\n\n`
+            return out + (msg.content || '')
+        }
+
+        const runFetch = async (id: string, model: string, token: string, setter: any, reasoning = false) => {
+            if (!enabled[id]) return
+            try {
+                const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model,
+                        messages: [{ role: "user", content: input }],
+                        ...(reasoning ? { reasoning: { enabled: true } } : {})
+                    })
+                })
+                const data = await res.json()
+                setter(parse(data))
+            } catch (err) {
+                setter('Error styling')
+            }
+        }
+
+        await Promise.all([
+            runFetch('deepseek', 'deepseek/deepseek-r1-0528:free', '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', setDsRes),
+            runFetch('gpt', 'mistralai/devstral-2512:free', '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', setGptRes),
+            runFetch('gemini', 'nvidia/nemotron-3-nano-30b-a3b:free', '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', setGemRes, true)
+        ])
+        setLoading(false)
+    }
+
+    async function saveChat() {
+        if (!user) return showToast('Login to save', 'error')
+        const p = lastPrompt || input
+        const t = localStorage.getItem('token')
+        if (!t || !p) return
+
+        try {
+            const res = await fetch('http://localhost:3000/api/chat/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-auth-token': t },
+                body: JSON.stringify({
+                    chatId,
+                    prompt: p,
+                    responses: { deepseek: dsRes, gpt: gptRes, gemini: gemRes }
+                })
+            })
+            const data = await res.json()
+            if (data._id) {
+                setChatId(data._id)
+                if (onChatSaved) onChatSaved()
+            }
+        } catch (e) {
+            showToast('Save failed', 'error')
+        }
+    }
+
     if (!user) {
         return (
             <div className="main">
-                <div className="landing-container">
-                    <div className="landing-content">
-                        <h1 className="landing-title">Welcome to Nexus AI</h1>
-                        <p className="landing-subtitle">
-                            Experience the power of multiple advanced AI models in one unified interface.
-                            Sign in to start your journey where knowledge begins.
-                        </p>
-                        <div className="landing-buttons">
-                            <button className="landing-btn signin-btn-landing" onClick={() => openAuth(true)}>
-                                Sign In
-                            </button>
-                            <button className="landing-btn signup-btn-landing" onClick={() => openAuth(false)}>
-                                Sign Up
-                            </button>
+                <div className="landingContainer">
+                    <div className="landingContent">
+                        <h1 className="landingTitle">Welcome to Nexus AI</h1>
+                        <p className="landingSubtitle">Multiple AIs. One place.</p>
+                        <div className="landingButtons">
+                            <button className="landingBtn signinBtnLanding" onClick={() => openAuth(true)}>Sign In</button>
+                            <button className="landingBtn signupBtnLanding" onClick={() => openAuth(false)}>Sign Up</button>
                         </div>
                     </div>
                 </div>
@@ -35,37 +116,79 @@ function Main({ user, openAuth }: { user: any, openAuth: (v: boolean) => void })
         )
     }
 
-    // logged in view
     return (
         <div className="main">
-            <div className="split-view">
+            <div className="splitView">
                 {models.map((m, i) => (
-                    <div className="split-panel" key={m.id}>
-                        <div className="model-header">
-                            <button className="model-dropdown">
-                                <div className={`model-icon ${m.color}`}>{m.icon}</div>
+                    <div className="splitPanel" key={m.id}>
+                        <div className="modelHeader">
+                            <div className="modelDropdown">
+                                <div className={`modelIcon ${m.color}`}>{m.icon}</div>
                                 <span>{m.name}</span>
-                                <ChevronDown className="chevron" size={14} />
-                            </button>
-                            <div className="toggle-switch">
-                                <input type="checkbox" id={`t${i}`} />
+                            </div>
+                            <div className="toggleSwitch">
+                                <input type="checkbox" id={`t${i}`} checked={enabled[m.id]} onChange={(e) => setEnabled({ ...enabled, [m.id]: e.target.checked })} />
                                 <label htmlFor={`t${i}`}></label>
                             </div>
+                        </div>
+
+                        <div className="chatArea">
+                            {loading && enabled[m.id] && !(m.id === 'gpt' ? gptRes : m.id === 'gemini' ? gemRes : dsRes) && (
+                                <div className="loadingMsg">
+                                    <Loader2 className="spin" size={16} />
+                                    <span>Thinking...</span>
+                                </div>
+                            )}
+                            {((m.id === 'gpt' ? gptRes : m.id === 'gemini' ? gemRes : dsRes)) && (
+                                <div className="aiMessage">
+                                    <div className="msgIcon">{m.icon}</div>
+                                    <div className="msgText">
+                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                            {m.id === 'gpt' ? gptRes : m.id === 'gemini' ? gemRes : dsRes}
+                                        </ReactMarkdown>
+                                    </div>
+                                </div>
+                            )}
+                            {!loading && !(m.id === 'gpt' ? gptRes : m.id === 'gemini' ? gemRes : dsRes) && (
+                                <div className="emptyChat">Ask {m.name} something!</div>
+                            )}
                         </div>
                     </div>
                 ))}
             </div>
 
-            <div className="search-container">
-                <div className="search-box">
-                    <button className="icon-btn attach-btn"><Paperclip size={20} /></button>
-                    <input type="text" placeholder="Ask me anything..." className="search-input" />
-                    <div className="search-actions">
-                        <button className="icon-btn mic-btn"><Mic size={20} /></button>
-                        <button className="send-btn"><Send size={16} /></button>
+            <div className="searchContainer">
+                <div className="searchBox">
+                    <button className="iconBtn attachBtn" onClick={onNewChat} title="New Chat"><Plus size={20} /></button>
+                    <input
+                        type="text"
+                        placeholder="Ask anything..."
+                        className="searchInput"
+                        value={input}
+                        onChange={e => setInput(e.target.value)}
+                        onKeyDown={e => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault()
+                                sendMessage()
+                            }
+                        }}
+                    />
+                    <div className="searchActions">
+                        <button className="iconBtn saveBtn" onClick={saveChat} title="Save Chat"><Save size={20} /></button>
+                        <button className="sendBtn" onClick={sendMessage} disabled={loading}>
+                            {loading ? <Loader2 className="spin" size={16} /> : <Send size={16} />}
+                        </button>
                     </div>
                 </div>
             </div>
+
+            {toast && (
+                <div className={`toastNotification toast-${toast.type}`}>
+                    {toast.type === 'success' ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
+                    <span>{toast.msg}</span>
+                    <button onClick={() => setToast(null)} style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', marginLeft: '10px' }}><X size={14} /></button>
+                </div>
+            )}
         </div>
     )
 }

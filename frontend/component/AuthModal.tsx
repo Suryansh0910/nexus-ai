@@ -1,106 +1,70 @@
 import { useState, useEffect } from 'react'
 import './AuthModal.css'
 
-type Props = {
-    open: boolean
-    close: () => void
-    onLogin: (data: any) => void
-    startWithLogin?: boolean
-}
-
-function AuthModal({ open, close, onLogin, startWithLogin = true }: Props) {
+function AuthModal({ open, close, onLogin, startWithLogin = true }: any) {
     let [mode, setMode] = useState(startWithLogin)
-    let [form, setForm] = useState({ username: '', email: '', password: '' })
-    let [error, setError] = useState('')
+    let [f, setF] = useState({ username: '', email: '', password: '' })
+    let [err, setErr] = useState('')
 
     useEffect(() => {
         if (open) {
             setMode(startWithLogin)
-            setError('')
-            setForm({ username: '', email: '', password: '' })
+            setErr('')
+            setF({ username: '', email: '', password: '' })
         }
     }, [open, startWithLogin])
 
     if (!open) return null
 
-    function update(e: any) {
-        setForm({ ...form, [e.target.name]: e.target.value })
-    }
-
-    async function submit(e: any) {
+    async function sub(e: any) {
         e.preventDefault()
-        setError('')
-
-        let endpoint = mode ? 'signin' : 'signup'
-        let body = mode ? { email: form.email, password: form.password } : form
-
+        setErr('')
+        let path = mode ? 'signin' : 'signup'
+        let b = mode ? { username: f.username, password: f.password } : f
         try {
-            let res = await fetch(`http://localhost:3000/api/auth/${endpoint}`, {
+            let res = await fetch(`http://localhost:3000/api/auth/${path}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
+                body: JSON.stringify(b)
             })
-            let data = await res.json()
-
+            let d = await res.json()
             if (res.ok) {
-                localStorage.setItem('token', data.token)
-                onLogin(data.user)
+                localStorage.setItem('token', d.token)
+                onLogin(d.user)
                 close()
-            } else {
-                setError(data.msg || 'Something went wrong')
-            }
-        } catch (err) {
-            setError('Cant connect to server')
+            } else setErr(d.msg || 'Error')
+        } catch (e) {
+            setErr('Server down')
         }
     }
 
     return (
-        <div className="auth-overlay" onClick={close}>
-            <div className="auth-modal" onClick={e => e.stopPropagation()}>
-                <button className="close-btn" onClick={close}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M18 6L6 18M6 6l12 12"></path>
-                    </svg>
-                </button>
-
-                <div className="auth-header">
-                    <h2>{mode ? 'Welcome Back' : 'Create Account'}</h2>
-                    <p>{mode ? 'Sign in to continue to Nexus AI' : 'Join Nexus AI today'}</p>
+        <div className="authOverlay" onClick={close}>
+            <div className="authModal" onClick={e => e.stopPropagation()}>
+                <div className="authHeader">
+                    <h2>{mode ? 'Login' : 'Signup'}</h2>
+                    <p>{mode ? 'Welcome back!' : 'Join us!'}</p>
                 </div>
-
-                {error && <div className="error-message">{error}</div>}
-
-                <form className="auth-form" onSubmit={submit}>
+                {err && <div className="errorMessage">{err}</div>}
+                <form className="authForm" onSubmit={sub}>
+                    <div className="formGroup">
+                        <label>Username</label>
+                        <input type="text" name="username" value={f.username} onChange={e => setF({ ...f, username: e.target.value })} required />
+                    </div>
                     {!mode && (
-                        <div className="form-group">
-                            <label>Username</label>
-                            <input type="text" name="username" placeholder="Enter username"
-                                value={form.username} onChange={update} required />
+                        <div className="formGroup">
+                            <label>Email</label>
+                            <input type="email" name="email" value={f.email} onChange={e => setF({ ...f, email: e.target.value })} required />
                         </div>
                     )}
-
-                    <div className="form-group">
-                        <label>Email</label>
-                        <input type="email" name="email" placeholder="Enter email"
-                            value={form.email} onChange={update} required />
-                    </div>
-
-                    <div className="form-group">
+                    <div className="formGroup">
                         <label>Password</label>
-                        <input type="password" name="password" placeholder="Enter password"
-                            value={form.password} onChange={update} required />
+                        <input type="password" name="password" value={f.password} onChange={e => setF({ ...f, password: e.target.value })} required />
                     </div>
-
-                    <button type="submit" className="submit-btn">
-                        {mode ? 'Sign In' : 'Sign Up'}
-                    </button>
+                    <button type="submit" className="submitBtn">{mode ? 'In' : 'Up'}</button>
                 </form>
-
-                <div className="auth-footer">
-                    {mode ? "Don't have an account?" : "Already have an account?"}
-                    <button onClick={() => setMode(!mode)}>
-                        {mode ? 'Sign Up' : 'Sign In'}
-                    </button>
+                <div className="authFooter">
+                    <button onClick={() => setMode(!mode)}>{mode ? 'Signup instead' : 'Login instead'}</button>
                 </div>
             </div>
         </div>

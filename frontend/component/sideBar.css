@@ -7,7 +7,7 @@
     flex-direction: column;
 }
 
-.sidebar-content {
+.sidebarContent {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -16,33 +16,33 @@
     padding: 1rem;
 }
 
-.sidebar-top {
+.sidebarTop {
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
 }
 
-.sidebar-header {
+.sidebarHeader {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0.5rem 0;
 }
 
-.header-left {
+.headerLeft {
     display: flex;
     align-items: center;
     gap: 0.75rem;
 }
 
-.sidebar-header .logo {
+.sidebarHeader .logo {
     width: 2.25rem;
     height: 2.25rem;
     border-radius: 8px;
     object-fit: cover;
 }
 
-.sidebar-header h2 {
+.sidebarHeader h2 {
     color: #ffffff;
     font-size: 1.25rem;
     font-weight: 600;
@@ -50,7 +50,7 @@
 }
 
 /* Settings Button */
-.settings-btn {
+.settingsBtn {
     background: transparent;
     border: none;
     color: #666666;
@@ -60,20 +60,19 @@
     align-items: center;
     justify-content: center;
     border-radius: 6px;
-    transition: color 0.2s ease, background-color 0.2s ease;
 }
 
-.settings-btn:hover {
+.settingsBtn:hover {
     color: #ffffff;
     background-color: #1a1a1a;
 }
 
 /* New Chat Button */
-.new-chat {
+.newChat {
     width: 100%;
 }
 
-.new-chat-btn {
+.newChatBtn {
     width: 100%;
     padding: 0.75rem 1rem;
     background-color: transparent;
@@ -83,50 +82,132 @@
     font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
-.new-chat-btn:hover {
+.newChatBtn:hover {
     background-color: #1a1a1a;
     border-color: #444444;
 }
 
 
-.chat-section {
+.chatSection {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     padding: 0.25rem 0;
 }
 
-.chat-title {
+.chatTitle {
     color: #ffffff;
     font-size: 1rem;
     font-weight: 600;
 }
 
-.chat-description {
-    color: #666666;
-    font-size: 0.85rem;
-    line-height: 1.5;
-    font-weight: 400;
+.chatList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    overflow-y: auto;
+    max-height: calc(100vh - 250px);
+}
+
+.chatItem {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: #a0a0a0;
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-align: left;
+    width: 100%;
+}
+
+.chatItem:hover {
+    background-color: #1a1a1a;
+    color: #ffffff;
+}
+
+.chatItem span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chatItemContainer {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 4px;
+    position: relative;
+    border-radius: 8px;
+}
+
+.chatItemContainer:hover {
+    background-color: #1a1a1a;
+}
+
+.chatItemContainer .chatItem {
+    background: transparent;
+    padding: 0.75rem;
+    margin-bottom: 0;
+    flex-grow: 1;
+    border-radius: 0;
+}
+
+.chatItemContainer:hover .chatItem {
+    background-color: transparent;
+}
+
+.chatTitleText {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
+    display: block;
+}
+
+.deleteBtn {
+    background: none;
+    border: none;
+    color: #ef4444;
+    /* red */
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    display: none;
+    position: absolute;
+    right: 4px;
+    align-items: center;
+    justify-content: center;
+}
+
+.chatItemContainer:hover .deleteBtn {
+    display: flex;
+}
+
+.deleteBtn:hover {
+    background-color: rgba(239, 68, 68, 0.1);
 }
 
 
-.sidebar-footer {
+.sidebarFooter {
     width: 100%;
     padding-bottom: 1.5rem;
 }
 
 /* User Section */
-.user-section {
+.userSection {
     display: flex;
     flex-direction: column;
     gap: 1rem;
     width: 100%;
 }
 
-.upgrade-btn {
+.upgradeBtn {
     width: 100%;
     padding: 0.75rem 1rem;
     background-color: #0f0f0f;
@@ -140,21 +221,20 @@
     align-items: center;
     justify-content: center;
     gap: 0.6rem;
-    transition: all 0.2s ease;
 }
 
-.upgrade-btn:hover {
+.upgradeBtn:hover {
     background-color: #1a1a1a;
     border-color: #3a3a3a;
     color: #ffffff;
 }
 
-.upgrade-btn .upgrade-icon {
+.upgradeBtn .upgrade-icon {
     font-size: 1rem;
     color: #e5e5e5;
 }
 
-.user-profile {
+.userProfile {
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -164,7 +244,7 @@
     border: 1px solid #2a2a2a;
 }
 
-.user-avatar {
+.userAvatar {
     width: 2.25rem;
     height: 2.25rem;
     background-color: #2a2a2a;
@@ -178,7 +258,7 @@
     flex-shrink: 0;
 }
 
-.user-info {
+.userInfo {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -186,7 +266,7 @@
     gap: 0.25rem;
 }
 
-.user-name {
+.userName {
     color: #fff;
     font-size: 0.9rem;
     font-weight: 500;
@@ -195,26 +275,25 @@
     text-overflow: ellipsis;
 }
 
-.user-plan {
+.userPlan {
     color: #666;
     font-size: 0.75rem;
 }
 
-.logout-btn {
+.logoutBtn {
     background: transparent;
     border: none;
     color: #666;
     cursor: pointer;
     padding: 0.25rem;
     display: flex;
-    transition: color 0.2s;
 }
 
-.logout-btn:hover {
+.logoutBtn:hover {
     color: #ffffff;
 }
 
-.signin-btn {
+.signinBtn {
     width: 100%;
     padding: 0.85rem 1rem;
     background-color: #0f0f0f;
@@ -224,11 +303,77 @@
     font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
 }
 
-.signin-btn:hover {
+.signinBtn:hover {
     background-color: #1a1a1a;
     border-color: #3a3a3a;
     color: #ffffff;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.deleteModal {
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 24px;
+    width: 90%;
+    max-width: 320px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.deleteModal h3 {
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.deleteModal p {
+    color: #a0a0a0;
+    font-size: 0.95rem;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.deleteModalActions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+    justify-content: flex-end;
+}
+
+.deleteModalBtn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+}
+
+.deleteModalCancel {
+    background-color: transparent;
+    color: #e5e5e5;
+    border: 1px solid #333;
+}
+
+.deleteModalCancel:hover {
+    background-color: #2a2a2a;
+}
+
+.deleteModalConfirm {
+    background-color: #ef4444;
+    color: #fff;
+}
+
+.deleteModalConfirm:hover {
+    background-color: #dc2626;
 }

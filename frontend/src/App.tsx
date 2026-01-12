@@ -7,42 +7,39 @@ import AuthModal from '../component/AuthModal'
 
 function App() {
   let [modal, setModal] = useState(false)
-  let [isLogin, setIsLogin] = useState(true)
-  let [user, setUser] = useState<any>(null)
+  let [isL, setIsL] = useState(true)
+  let [u, setU] = useState<any>(null)
+  let [sid, setSid] = useState(0)
+  let [sel, setSel] = useState<any>(null)
+  let [ref, setRef] = useState(0)
 
   useEffect(() => {
     let t = localStorage.getItem('token')
-    let u = localStorage.getItem('userData')
-    if (t && u) setUser(JSON.parse(u))
+    let d = localStorage.getItem('userData')
+    if (t && d) setU(JSON.parse(d))
   }, [])
 
-  function handleLogin(data: any) {
+  function onIn(data: any) {
     localStorage.setItem('userData', JSON.stringify(data))
-    setUser(data)
+    setU(data)
+    setSel(null)
+    setSid(p => p + 1)
     setModal(false)
   }
 
-  function handleLogout() {
+  function onOut() {
     localStorage.removeItem('token')
     localStorage.removeItem('userData')
-    setUser(null)
-  }
-
-  function openModal(login: boolean) {
-    setIsLogin(login)
-    setModal(true)
+    setU(null)
+    setSel(null)
+    setSid(p => p + 1)
   }
 
   return (
-    <div className="app-container">
-      <Sidebar user={user} onLogout={handleLogout} />
-      <Main user={user} openAuth={openModal} />
-      <AuthModal
-        open={modal}
-        close={() => setModal(false)}
-        onLogin={handleLogin}
-        startWithLogin={isLogin}
-      />
+    <div className="appContainer">
+      <Sidebar user={u} onLogout={onOut} onNewChat={() => { setSel(null); setSid(p => p + 1) }} onSelectChat={(c: any) => { setSel(c); setSid(p => p + 1) }} refreshTrigger={ref} />
+      <Main key={sid} user={u} openAuth={(l: any) => { setIsL(l); setModal(true) }} loadedChat={sel} onChatSaved={() => setRef(p => p + 1)} onNewChat={() => { setSel(null); setSid(p => p + 1) }} />
+      <AuthModal open={modal} close={() => setModal(false)} onLogin={onIn} startWithLogin={isL} />
     </div>
   )
 }
