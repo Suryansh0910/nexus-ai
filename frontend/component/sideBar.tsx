@@ -14,9 +14,10 @@ function Sidebar({ user, onLogout, onNewChat, onSelectChat, refreshTrigger }: an
 
     async function load() {
         const t = localStorage.getItem('token')
+        const api = import.meta.env.VITE_API_URL || 'http://localhost:3000'
         if (!t) return
         try {
-            const res = await fetch('http://localhost:3000/api/chat', {
+            const res = await fetch(`${api}/api/chat`, {
                 headers: { 'x-auth-token': t }
             })
             const data = await res.json()
@@ -29,8 +30,9 @@ function Sidebar({ user, onLogout, onNewChat, onSelectChat, refreshTrigger }: an
     async function confirmDelete() {
         if (!delId) return
         const t = localStorage.getItem('token')
+        const api = import.meta.env.VITE_API_URL || 'http://localhost:3000'
         try {
-            const res = await fetch(`http://localhost:3000/api/chat/${delId}`, {
+            const res = await fetch(`${api}/api/chat/${delId}`, {
                 method: 'DELETE',
                 headers: { 'x-auth-token': t || '' }
             })

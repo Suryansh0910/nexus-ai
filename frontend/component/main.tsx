@@ -80,7 +80,8 @@ function Main({ user, openAuth, loadedChat, onChatSaved, onNewChat }: any) {
         if (!t || !p) return
 
         try {
-            const res = await fetch('http://localhost:3000/api/chat/save', {
+            const api = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+            const res = await fetch(`${api}/api/chat/save`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'x-auth-token': t },
                 body: JSON.stringify({

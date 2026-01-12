@@ -21,8 +21,9 @@ function AuthModal({ open, close, onLogin, startWithLogin = true }: any) {
         setErr('')
         let path = mode ? 'signin' : 'signup'
         let b = mode ? { username: f.username, password: f.password } : f
+        const api = import.meta.env.VITE_API_URL || 'http://localhost:3000'
         try {
-            let res = await fetch(`http://localhost:3000/api/auth/${path}`, {
+            let res = await fetch(`${api}/api/auth/${path}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(b)
