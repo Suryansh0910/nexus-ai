@@ -21,7 +21,7 @@ function AuthModal({ open, close, onLogin, startWithLogin = true }: any) {
         setErr('')
         let path = mode ? 'signin' : 'signup'
         let b = mode ? { username: f.username, password: f.password } : f
-        const api = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+        const api = import.meta.env.VITE_API_URL || 'https://nexus-ai-1-3qls.onrender.com'
         try {
             let res = await fetch(`${api}/api/auth/${path}`, {
                 method: 'POST',

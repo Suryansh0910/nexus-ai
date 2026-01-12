@@ -14,7 +14,7 @@ function Sidebar({ user, onLogout, onNewChat, onSelectChat, refreshTrigger }: an
 
     async function load() {
         const t = localStorage.getItem('token')
-        const api = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+        const api = import.meta.env.VITE_API_URL || 'https://nexus-ai-1-3qls.onrender.com'
         if (!t) return
         try {
             const res = await fetch(`${api}/api/chat`, {
@@ -30,7 +30,7 @@ function Sidebar({ user, onLogout, onNewChat, onSelectChat, refreshTrigger }: an
     async function confirmDelete() {
         if (!delId) return
         const t = localStorage.getItem('token')
-        const api = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+        const api = import.meta.env.VITE_API_URL || 'https://nexus-ai-1-3qls.onrender.com'
         try {
             const res = await fetch(`${api}/api/chat/${delId}`, {
                 method: 'DELETE',

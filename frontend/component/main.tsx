@@ -97,7 +97,7 @@ function Main({ user, openAuth, loadedChat, onChatSaved, onNewChat }: any) {
         if (!t || !p) return
 
         try {
-            const api = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+            const api = import.meta.env.VITE_API_URL || 'https://nexus-ai-1-3qls.onrender.com'
             const res = await fetch(`${api}/api/chat/save`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'x-auth-token': t },
