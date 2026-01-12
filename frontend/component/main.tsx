@@ -66,9 +66,9 @@ function Main({ user, openAuth, loadedChat, onChatSaved, onNewChat }: any) {
         }
 
         await Promise.all([
-            runFetch('deepseek', 'deepseek/deepseek-r1-0528:free', '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', setDsRes),
-            runFetch('gpt', 'mistralai/devstral-2512:free', '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', setGptRes),
-            runFetch('gemini', 'nvidia/nemotron-3-nano-30b-a3b:free', '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', setGemRes, true)
+            runFetch('deepseek', 'deepseek/deepseek-r1-0528:free', import.meta.env.VITE_DEEPSEEK_KEY, setDsRes),
+            runFetch('gpt', 'mistralai/devstral-2512:free', import.meta.env.VITE_MISTRAL_KEY, setGptRes),
+            runFetch('gemini', 'nvidia/nemotron-3-nano-30b-a3b:free', import.meta.env.VITE_NVIDIA_KEY, setGemRes, true)
         ])
         setLoading(false)
     }
