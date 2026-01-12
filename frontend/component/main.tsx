@@ -39,36 +39,53 @@ function Main({ user, openAuth, loadedChat, onChatSaved, onNewChat }: any) {
             const msg = data.choices?.[0]?.message
             if (!msg) return 'Error: No respond'
             let out = ''
-            if (msg.reasoning) out += `> **Thinking:**\n> ${msg.reasoning.replace(/\n/g, '\n> ')}\n\n`
+            const reasoning = msg.reasoning || msg.reasoning_details
+            if (reasoning) out += `> **Thinking:**\n> ${reasoning.replace(/\n/g, '\n> ')}\n\n`
             return out + (msg.content || '')
         }
 
-        const runFetch = async (id: string, model: string, token: string, setter: any, reasoning = false) => {
+        const runFetch = async (id: string, model: string, token: string, setter: any) => {
             if (!enabled[id]) return
             try {
                 const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                     method: "POST",
                     headers: {
                         "Authorization": `Bearer ${token}`,
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        "HTTP-Referer": "http://localhost:5173",
+                        "X-Title": "Nexus AI"
                     },
                     body: JSON.stringify({
                         model,
                         messages: [{ role: "user", content: input }],
-                        ...(reasoning ? { reasoning: { enabled: true } } : {})
+                        reasoning: { enabled: true }
                     })
                 })
+                // ... (rest of the function remains similar)
+                if (res.status === 401) {
+                    setter('Error: Invalid API Key (401)')
+                    return
+                }
+
                 const data = await res.json()
-                setter(parse(data))
+                if (data.error) {
+                    setter(`Error: ${data.error.message || 'Check API Key'}`)
+                } else {
+                    setter(parse(data))
+                }
             } catch (err) {
-                setter('Error styling')
+                setter('Connection error')
             }
         }
 
+        const key1 = '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'
+        const key2 = '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'
+        const key3 = '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'
+
         await Promise.all([
-            runFetch('deepseek', 'deepseek/deepseek-r1-0528:free', import.meta.env.VITE_DEEPSEEK_KEY, setDsRes),
-            runFetch('gpt', 'mistralai/devstral-2512:free', import.meta.env.VITE_MISTRAL_KEY, setGptRes),
-            runFetch('gemini', 'nvidia/nemotron-3-nano-30b-a3b:free', import.meta.env.VITE_NVIDIA_KEY, setGemRes, true)
+            runFetch('gpt', 'mistralai/mistral-7b-instruct:free', key1, setGptRes),
+            runFetch('gemini', 'nvidia/nemotron-3-nano-30b-a3b:free', key2, setGemRes),
+            runFetch('deepseek', 'deepseek/deepseek-r1', key3, setDsRes)
         ])
         setLoading(false)
     }
