@@ -78,9 +78,9 @@ function Main({ user, openAuth, loadedChat, onChatSaved, onNewChat }: any) {
             }
         }
 
-        const key1 = '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'
-        const key2 = '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'
-        const key3 = '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'
+        const key1 = import.meta.env.VITE_MISTRAL_KEY
+        const key2 = import.meta.env.VITE_NVIDIA_KEY
+        const key3 = import.meta.env.VITE_DEEPSEEK_KEY
 
         await Promise.all([
             runFetch('gpt', 'mistralai/mistral-7b-instruct:free', key1, setGptRes),
