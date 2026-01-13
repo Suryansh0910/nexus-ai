@@ -85,7 +85,7 @@ function Main({ user, openAuth, loadedChat, onChatSaved, onNewChat }: any) {
         await Promise.all([
             runFetch('gpt', 'mistralai/mistral-7b-instruct:free', key1, setGptRes),
             runFetch('gemini', 'nvidia/nemotron-3-nano-30b-a3b:free', key2, setGemRes),
-            runFetch('deepseek', 'deepseek/deepseek-r1', key3, setDsRes)
+            runFetch('deepseek', 'deepseek/deepseek-r1-0528:free', key3, setDsRes)
         ])
         setLoading(false)
     }
