@@ -5,6 +5,7 @@ function AuthModal({ open, close, onLogin, startWithLogin = true }: any) {
     let [mode, setMode] = useState(startWithLogin)
     let [f, setF] = useState({ username: '', email: '', password: '' })
     let [err, setErr] = useState('')
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (open) {
@@ -18,6 +19,7 @@ function AuthModal({ open, close, onLogin, startWithLogin = true }: any) {
 
     async function sub(e: any) {
         e.preventDefault()
+        setLoading(true);
         setErr('')
         let path = mode ? 'signin' : 'signup'
         let b = mode ? { username: f.username, password: f.password } : f
@@ -36,6 +38,8 @@ function AuthModal({ open, close, onLogin, startWithLogin = true }: any) {
             } else setErr(d.msg || 'Error')
         } catch (e) {
             setErr('Server down')
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -65,7 +69,7 @@ function AuthModal({ open, close, onLogin, startWithLogin = true }: any) {
                     <button type="submit" className="submitBtn">{mode ? 'In' : 'Up'}</button>
                 </form>
                 <div className="authFooter">
-                    <button onClick={() => setMode(!mode)}>{mode ? 'Signup instead' : 'Login instead'}</button>
+                    <button disabled={loading} onClick={() => setMode(!mode)}>{mode ? 'Signup instead' : 'Login instead'}</button>
                 </div>
             </div>
         </div>
