@@ -5,9 +5,9 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
 let models = [
-    { id: 'gpt', name: 'Mistral Dev', icon: <Bot size={18} />, color: 'gptIcon' },
+    { id: 'gpt', name: 'Gemma 3n', icon: <Bot size={18} />, color: 'gptIcon' },
     { id: 'gemini', name: 'Nvidia Nemotron', icon: <Sparkles size={18} />, color: 'geminiIcon' },
-    { id: 'deepseek', name: 'DeepSeek R1', icon: <Brain size={18} />, color: 'deepseekIcon' }
+    { id: 'deepseek', name: 'Llama 3.2', icon: <Brain size={18} />, color: 'deepseekIcon' }
 ]
 
 function Main({ user, openAuth, loadedChat, onChatSaved, onNewChat }: any) {
@@ -83,9 +83,9 @@ function Main({ user, openAuth, loadedChat, onChatSaved, onNewChat }: any) {
         const key3 = import.meta.env.VITE_DEEPSEEK_KEY
 
         await Promise.all([
-            runFetch('gpt', 'mistralai/mistral-small-3.1-24b-instruct:free', key1, setGptRes),
+            runFetch('gpt', 'google/gemma-3n-e2b-it:free', key1, setGptRes),
             runFetch('gemini', 'nvidia/nemotron-3-nano-30b-a3b:free', key2, setGemRes),
-            runFetch('deepseek', 'deepseek/deepseek-r1-0528:free', key3, setDsRes)
+            runFetch('deepseek', 'openai/gpt-oss-120b:free', key3, setDsRes)
         ])
         setLoading(false)
     }
