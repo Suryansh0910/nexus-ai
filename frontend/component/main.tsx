@@ -94,7 +94,8 @@ function Main({ user, openAuth, loadedChat, onChatSaved, onNewChat }: any) {
         if (!user) return showToast('Login to save', 'error')
         const p = lastPrompt || input
         const t = localStorage.getItem('token')
-        if (!t || !p) return
+        if (!t) return showToast('Session expired, please login again', 'error')
+        if (!p) return showToast('Nothing to save yet', 'error')
 
         try {
             const api = import.meta.env.VITE_API_URL || 'https://nexus-ai-1-3qls.onrender.com'
@@ -107,15 +108,26 @@ function Main({ user, openAuth, loadedChat, onChatSaved, onNewChat }: any) {
                     responses: { deepseek: dsRes, gpt: gptRes, gemini: gemRes }
                 })
             })
+            if (res.status === 401) {
+                localStorage.removeItem('token')
+                localStorage.removeItem('userData')
+                showToast('Session expired — please log in again', 'error')
+                if (openAuth) openAuth(true)
+                return
+            }
             const data = await res.json()
             if (data._id) {
                 setChatId(data._id)
+                showToast('Chat saved!', 'success')
                 if (onChatSaved) onChatSaved()
+            } else {
+                showToast(data.msg || 'Save failed', 'error')
             }
         } catch (e) {
             showToast('Save failed', 'error')
         }
     }
+
 
     if (!user) {
         return (

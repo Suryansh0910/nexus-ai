@@ -66,10 +66,10 @@ function AuthModal({ open, close, onLogin, startWithLogin = true }: any) {
                         <label>Password</label>
                         <input type="password" name="password" value={f.password} onChange={e => setF({ ...f, password: e.target.value })} required />
                     </div>
-                    <button type="submit" className="submitBtn">{mode ? 'Sign-In' : 'Sign-Up'}</button>
+                    <button type="submit" disabled={loading} className="submitBtn">{loading ? 'Please wait...' : (mode ? 'Sign-In' : 'Sign-Up')}</button>
                 </form>
                 <div className="authFooter">
-                    <button disabled={loading} onClick={() => setMode(!mode)}>{mode ? 'Signup instead' : 'Login instead'}</button>
+                    <button onClick={() => setMode(!mode)}>{mode ? 'Signup instead' : 'Login instead'}</button>
                 </div>
             </div>
         </div>

@@ -22,7 +22,7 @@ router.post('/save', auth, async (req, res) => {
         await c.save()
         res.json(c)
     } catch (err) {
-        res.status(500).send('err')
+        res.status(500).json({ msg: 'Server error' })
     }
 })
 
@@ -31,7 +31,7 @@ router.get('/', auth, async (req, res) => {
         const cs = await Chat.find({ userId: req.user.id }).sort({ updatedAt: -1 })
         res.json(cs)
     } catch (err) {
-        res.status(500).send('err')
+        res.status(500).json({ msg: 'Server error' })
     }
 })
 
@@ -41,7 +41,7 @@ router.get('/:id', auth, async (req, res) => {
         if (!c || c.userId.toString() !== req.user.id) return res.status(404).json({ msg: 'not found' })
         res.json(c)
     } catch (err) {
-        res.status(500).send('err')
+        res.status(500).json({ msg: 'Server error' })
     }
 })
 
@@ -52,7 +52,7 @@ router.delete('/:id', auth, async (req, res) => {
         await Chat.deleteOne({ _id: req.params.id })
         res.json({ msg: 'done' })
     } catch (err) {
-        res.status(500).send('err')
+        res.status(500).json({ msg: 'Server error' })
     }
 })
 

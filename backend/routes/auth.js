@@ -21,7 +21,7 @@ router.post('/signup', async (req, res) => {
         let token = jwt.sign({ user: { id: user.id } }, process.env.JWT_SECRET, { expiresIn: '30d' })
         res.status(201).json({ token, user: { id: user.id, username, email } })
     } catch (e) {
-        res.status(500).send('bad')
+        res.status(500).json({ msg: 'Server error' })
     }
 })
 
@@ -36,7 +36,7 @@ router.post('/signin', async (req, res) => {
         let t = jwt.sign({ user: { id: u.id } }, process.env.JWT_SECRET, { expiresIn: '30d' })
         res.json({ token: t, user: { id: u.id, username: u.username, email: u.email } })
     } catch (e) {
-        res.status(500).send('err')
+        res.status(500).json({ msg: 'Server error' })
     }
 })
 

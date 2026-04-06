@@ -20,6 +20,11 @@ function Sidebar({ user, onLogout, onNewChat, onSelectChat, refreshTrigger }: an
             const res = await fetch(`${api}/api/chat`, {
                 headers: { 'x-auth-token': t }
             })
+            if (res.status === 401) {
+                localStorage.removeItem('token')
+                localStorage.removeItem('userData')
+                return
+            }
             const data = await res.json()
             if (Array.isArray(data)) setChats(data)
         } catch (err) {
@@ -60,7 +65,7 @@ function Sidebar({ user, onLogout, onNewChat, onSelectChat, refreshTrigger }: an
                     <div className="chatSection">
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                             <h3 className="chatTitle">Saved Chats</h3>
-                            <span style={{ color: '#666', fontSize: '0.75rem' }}>{5 - chats.length} remaining</span>
+                            <span style={{ color: '#666', fontSize: '0.75rem' }}>{7 - chats.length} remaining</span>
                         </div>
                         <div className="chatList">
                             {chats.map(c => (
